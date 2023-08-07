@@ -63,8 +63,8 @@ def user_addresses():
     pass
 
 
-@app.route("/user/address/<id>", methods=["GET", "PUT", "DELETE"])
-def user_address():
+@app.route("/user/address/<address_id>", methods=["GET", "PUT", "DELETE"])
+def user_address(address_id):
     pass
 
 
@@ -74,17 +74,17 @@ def menu():
 
 
 @app.route("/menu/<cat_name>", methods=["GET"])
-def menu_category():
+def menu_category(cat_name):
     pass
 
 
 @app.route("/menu/<cat_name>/<dish>", methods=["GET"])
-def menu_dish():
+def menu_dish(cat_name, dish):
     pass
 
 
 @app.route("/menu/<cat_name>/<dish>/review", methods=["POST"])
-def menu_dish_review():
+def menu_dish_review(cat_name, dish):
     pass
 
 
@@ -99,12 +99,12 @@ def admin_menu():
 
 
 @app.route("/admin/menu/<cat_name>", methods=["GET", "POST", "PUT", "DELETE"])
-def admin_menu_category():
+def admin_menu_category(cat_name):
     pass
 
 
 @app.route("/admin/menu/<cat_name>/<dish>", methods=["GET", "POST", "PUT", "DELETE"])
-def admin_menu_dish():
+def admin_menu_dish(cat_name, dish):
     pass
 
 
@@ -117,7 +117,7 @@ def admin_orders():
 
 
 @app.route("/admin/orders/<order_id>", methods=["GET", "PUT"])
-def admin_order_id():
+def admin_order_id(order_id):
     pass
 
 
