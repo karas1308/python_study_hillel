@@ -1,6 +1,11 @@
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
+
+
+@app.route("/")
+def welcome_page():
+    return "Welcome"
 
 
 @app.route("/cart", methods=["GET", "PUT"])
@@ -68,17 +73,17 @@ def menu():
     pass
 
 
-@app.route("/menu/<cat name>", methods=["GET"])
+@app.route("/menu/<cat_name>", methods=["GET"])
 def menu_category():
     pass
 
 
-@app.route("/menu/<cat name>/<dish>", methods=["GET"])
+@app.route("/menu/<cat_name>/<dish>", methods=["GET"])
 def menu_dish():
     pass
 
 
-@app.route("/menu/<cat name>/<dish>/review", methods=["POST"])
+@app.route("/menu/<cat_name>/<dish>/review", methods=["POST"])
 def menu_dish_review():
     pass
 
@@ -86,6 +91,39 @@ def menu_dish_review():
 @app.route("/menu/search", methods=["POST"])
 def menu_search():
     pass
+
+
+@app.route("/admin/menu", methods=["GET", "POST", "PUT", "DELETE"])
+def admin_menu():
+    pass
+
+
+@app.route("/admin/menu/<cat_name>", methods=["GET", "POST", "PUT", "DELETE"])
+def admin_menu_category():
+    pass
+
+
+@app.route("/admin/menu/<cat_name>/<dish>", methods=["GET", "POST", "PUT", "DELETE"])
+def admin_menu_dish():
+    pass
+
+
+@app.route("/admin/orders", methods=["POST"])
+def admin_orders():
+    args = request.args
+    show_active_only = args.get('active')
+    if show_active_only:
+        pass
+
+
+@app.route("/admin/orders/<order_id>", methods=["GET", "PUT"])
+def admin_order_id():
+    pass
+
+
+@app.route("/admin/search", methods=["POST"])
+def admin_search():
+    menu_search()
 
 
 if __name__ == "__main__":
