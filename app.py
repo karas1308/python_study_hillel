@@ -1,4 +1,5 @@
 from flask import Flask, request
+import sqlite3
 
 app = Flask(__name__)
 
@@ -25,7 +26,19 @@ def cart_add():
 
 @app.route("/user", methods=["GET", "POST", "PUT", "DELETE"])
 def user():
-    pass
+    if request.method == "GET":
+        # /user?phone=3801111111111
+        args = request.args
+        phone = args.get('phone')
+        if phone:
+            con = sqlite3.connect("dish.db")
+            new_cur = con.cursor()
+            res = new_cur.execute(f"SELECT * FROM User where phone='{phone}'")
+            results = res.fetchall()
+            con.close()
+            return results
+        else:
+            return "specify user's phone"
 
 
 @app.route("/user/register", methods=["POST"])
@@ -70,17 +83,34 @@ def user_address(address_id):
 
 @app.route("/menu", methods=["GET"])
 def menu():
-    pass
+    con = sqlite3.connect("dish.db")
+    new_cur = con.cursor()
+    res = new_cur.execute("SELECT * FROM Dishes")
+    results = res.fetchall()
+    con.close()
+    return results
 
 
 @app.route("/menu/<cat_name>", methods=["GET"])
 def menu_category(cat_name):
-    pass
+    # /menu/first
+    con = sqlite3.connect("dish.db")
+    new_cur = con.cursor()
+    res = new_cur.execute(f"SELECT * FROM Category WHERE name='{cat_name}'")
+    results = res.fetchall()
+    con.close()
+    return results
 
 
 @app.route("/menu/<cat_name>/<dish>", methods=["GET"])
 def menu_dish(cat_name, dish):
-    pass
+    # /menu/first/borshch
+    con = sqlite3.connect("dish.db")
+    new_cur = con.cursor()
+    res = new_cur.execute(f"SELECT * FROM Dishes WHERE category='{cat_name}' AND dish_name='{dish}'")
+    results = res.fetchall()
+    con.close()
+    return results
 
 
 @app.route("/menu/<cat_name>/<dish>/review", methods=["POST"])
@@ -100,7 +130,9 @@ def admin_menu():
 
 @app.route("/admin/menu/<cat_name>", methods=["GET", "POST", "PUT", "DELETE"])
 def admin_menu_category(cat_name):
-    pass
+    if request.method == "GET":
+        # /admin/menu/first
+        return menu_category(cat_name)
 
 
 @app.route("/admin/menu/<cat_name>/<dish>", methods=["GET", "POST", "PUT", "DELETE"])
