@@ -1,5 +1,9 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import sqlite3
+
+from services.menu import search_dish
+from services.users import add_user, login_user, log_out_user, get_user, change_user_password
+from utils.sql_lite import SQLiteDB
 
 app = Flask(__name__)
 
@@ -26,39 +30,28 @@ def cart_add():
 
 @app.route("/user", methods=["GET", "POST", "PUT", "DELETE"])
 def user():
-    if request.method == "GET":
-        # /user?phone=3801111111111
-        args = request.args
-        phone = args.get('phone')
-        if phone:
-            con = sqlite3.connect("dish.db")
-            new_cur = con.cursor()
-            res = new_cur.execute(f"SELECT * FROM User where phone='{phone}'")
-            results = res.fetchall()
-            con.close()
-            return results
-        else:
-            return "specify user's phone"
+    return get_user()
 
 
-@app.route("/user/register", methods=["POST"])
+@app.route("/user/register", methods=["GET", "POST"])
+# GET added to avoid error on direct call from browser
 def user_register():
-    pass
+    return add_user()
 
 
-@app.route("/user/sign_in", methods=["POST"])
+@app.route("/user/sign_in", methods=["GET", "POST"])
 def user_sign_in():
-    pass
+    return login_user()
 
 
-@app.route("/user/logout", methods=["POST"])
+@app.route("/user/logout", methods=["GET", "POST"])
 def user_logout():
-    pass
+    return log_out_user()
 
 
-@app.route("/user/restore", methods=["POST"])
+@app.route("/user/restore", methods=["GET", "POST"])
 def user_restore():
-    pass
+    return change_user_password()
 
 
 @app.route("/user/orders", methods=["GET"])
@@ -81,35 +74,47 @@ def user_address(address_id):
     pass
 
 
-@app.route("/menu", methods=["GET"])
+@app.route("/menu", methods=["GET", "POST"])
 def menu():
-    con = sqlite3.connect("dish.db")
-    new_cur = con.cursor()
-    res = new_cur.execute("SELECT * FROM Dishes")
-    results = res.fetchall()
-    con.close()
-    return results
+    with SQLiteDB("dish.db") as db:
+        if request.method == "POST":
+            data = request.form.to_dict()
+            data["id"] = data["dish_name"].replace(" ", "_")
+            data["available"] = 1
+            db.insert_into("Dishes", data)
+        dishes = db.select_from("Dishes", ["*"])
+    html_form = f"""
+    <form method="POST">
+        <input type="text" name="dish_name" placeholder="name">
+        <input type="text" name="price" placeholder="price">
+        <input type="text" name="description" placeholder="description">
+        <input type="text" name="photo" placeholder="photo">
+        <input type="text" name="ccal" placeholder="ccal">
+        <input type="text" name="protein" placeholder="protein">
+        <input type="text" name="fat" placeholder="fat">
+        <input type="text" name="carb" placeholder="carb">
+        <input type="text" name="category" placeholder="category">
+        <input type="submit">
+    </form>
+    <br>
+    {str(dishes)}
+    """
+    return html_form
 
 
 @app.route("/menu/<cat_name>", methods=["GET"])
 def menu_category(cat_name):
     # /menu/first
-    con = sqlite3.connect("dish.db")
-    new_cur = con.cursor()
-    res = new_cur.execute(f"SELECT * FROM Category WHERE name='{cat_name}'")
-    results = res.fetchall()
-    con.close()
+    with SQLiteDB("dish.db") as db:
+        results = db.select_from("Category", ["*"], where={"name": cat_name})
     return results
 
 
 @app.route("/menu/<cat_name>/<dish>", methods=["GET"])
 def menu_dish(cat_name, dish):
     # /menu/first/borshch
-    con = sqlite3.connect("dish.db")
-    new_cur = con.cursor()
-    res = new_cur.execute(f"SELECT * FROM Dishes WHERE category='{cat_name}' AND dish_name='{dish}'")
-    results = res.fetchall()
-    con.close()
+    with SQLiteDB("dish.db") as db:
+        results = db.select_from("Dishes", ["*"], where=f"category='{cat_name}' AND dish_name='{dish}'")
     return results
 
 
@@ -118,14 +123,16 @@ def menu_dish_review(cat_name, dish):
     pass
 
 
-@app.route("/menu/search", methods=["POST"])
+@app.route("/menu/search/", methods=["GET", "POST"])
 def menu_search():
-    pass
+    return search_dish()
 
 
 @app.route("/admin/menu", methods=["GET", "POST", "PUT", "DELETE"])
 def admin_menu():
-    pass
+    with SQLiteDB("dish.db") as db:
+        data = db.insert_into("Category", {"id": "second", "name": "second"})
+    return str(data)
 
 
 @app.route("/admin/menu/<cat_name>", methods=["GET", "POST", "PUT", "DELETE"])
