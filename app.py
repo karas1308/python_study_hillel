@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import sqlite3
 
-from services.menu import search_dish
+from services.menu import search_dish, menu_actions, get_category, get_dish
 from services.users import add_user, login_user, log_out_user, get_user, change_user_password, get_user_orders, \
     get_user_order_by_id
 from utils.sql_lite import SQLiteDB
@@ -78,46 +78,19 @@ def user_address(address_id):
 
 @app.route("/menu", methods=["GET", "POST"])
 def menu():
-    with SQLiteDB("dish.db") as db:
-        if request.method == "POST":
-            data = request.form.to_dict()
-            data["id"] = data["dish_name"].replace(" ", "_")
-            data["available"] = 1
-            db.insert_into("Dishes", data)
-        dishes = db.select_from("Dishes", ["*"])
-    html_form = f"""
-    <form method="POST">
-        <input type="text" name="dish_name" placeholder="name">
-        <input type="text" name="price" placeholder="price">
-        <input type="text" name="description" placeholder="description">
-        <input type="text" name="photo" placeholder="photo">
-        <input type="text" name="ccal" placeholder="ccal">
-        <input type="text" name="protein" placeholder="protein">
-        <input type="text" name="fat" placeholder="fat">
-        <input type="text" name="carb" placeholder="carb">
-        <input type="text" name="category" placeholder="category">
-        <input type="submit">
-    </form>
-    <br>
-    {str(dishes)}
-    """
-    return html_form
+    return menu_actions()
 
 
 @app.route("/menu/<cat_name>", methods=["GET"])
 def menu_category(cat_name):
     # /menu/first
-    with SQLiteDB("dish.db") as db:
-        results = db.select_from("Category", ["*"], where={"name": cat_name})
-    return results
+    return get_category(cat_name)
 
 
-@app.route("/menu/<cat_name>/<dish>", methods=["GET"])
-def menu_dish(cat_name, dish):
+@app.route("/menu/<cat_name>/<dish_name>", methods=["GET"])
+def menu_dish(cat_name, dish_name):
     # /menu/first/borshch
-    with SQLiteDB("dish.db") as db:
-        results = db.select_from("Dishes", ["*"], where=f"category='{cat_name}' AND dish_name='{dish}'")
-    return results
+    return get_dish(cat_name, dish_name)
 
 
 @app.route("/menu/<cat_name>/<dish>/review", methods=["POST"])
