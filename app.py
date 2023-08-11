@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import sqlite3
 
 from services.menu import search_dish
-from services.users import add_user, login_user, log_out_user, get_user, change_user_password
+from services.users import add_user, login_user, log_out_user, get_user, change_user_password, get_user_orders
 from utils.sql_lite import SQLiteDB
 
 app = Flask(__name__)
@@ -56,7 +56,7 @@ def user_restore():
 
 @app.route("/user/orders", methods=["GET"])
 def user_orders_history():
-    pass
+    return get_user_orders()
 
 
 @app.route("/user/orders/<order_id>", methods=["GET"])

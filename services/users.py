@@ -88,3 +88,9 @@ def change_user_password():
        {str(user)}
     """
     return html_form
+
+
+def get_user_orders():
+    with SQLiteDB("dish.db") as db:
+        orders = db.select_from("Orders", ["*"], where={"user": 1})
+    return orders
