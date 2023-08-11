@@ -50,10 +50,3 @@ class SQLiteDB:
             else:
                 query += f" WHERE {where}"
         return self.sql_query(query)
-
-# con = sqlite3.connect("dish.db")
-# new_cur = con.cursor()
-# res = new_cur.execute(f"SELECT * FROM User where phone='{phone}'")
-# results = res.fetchall()
-# con.close()
-# return results
