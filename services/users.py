@@ -2,6 +2,8 @@ from flask import request
 
 from utils.sql_lite import SQLiteDB
 
+test_user_id = 1
+
 
 def add_user():
     with SQLiteDB("dish.db") as db:
@@ -92,5 +94,12 @@ def change_user_password():
 
 def get_user_orders():
     with SQLiteDB("dish.db") as db:
-        orders = db.select_from("Orders", ["*"], where={"user": 1})
+        orders = db.select_from("Orders", ["*"], where={"user": test_user_id})
+    return orders
+
+
+def get_user_order_by_id(order_id):
+    # can be used order id only coz it is unique
+    with SQLiteDB("dish.db") as db:
+        orders = db.select_from("Orders", ["*"], where=f"user={test_user_id} and id={order_id}")
     return orders
