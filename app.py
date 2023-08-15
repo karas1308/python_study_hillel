@@ -1,6 +1,6 @@
 from flask import Flask, request
 
-from services.admin import admin_menu_actions, adm_menu
+from services.admin import admin_category_actions
 from services.menu import search_dish, menu_actions, get_category, get_dish, welcome_page
 from services.orders import start_cart
 from services.users import add_user, login_user, log_out_user, get_user, change_user_password, get_user_orders, \
@@ -106,7 +106,7 @@ def menu_search():
 
 @app.route("/admin/menu", methods=["GET", "POST", "PUT", "DELETE"])
 def admin_menu():
-    return adm_menu()
+    return admin_category_actions()
 
 
 @app.route("/admin/menu/<cat_name>", methods=["GET", "POST", "PUT", "DELETE"])

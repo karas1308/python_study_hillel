@@ -5,7 +5,7 @@ from flask import session, request, render_template, redirect
 from utils.sql_lite import SQLiteDB
 
 
-def admin_menu_actions():
+def admin_category_actions():
     if session.get("user_id"):
         if session.get("user_type") == 2:
             with SQLiteDB("dish.db") as db:
