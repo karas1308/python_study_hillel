@@ -1,22 +1,23 @@
-from flask import Flask, request, jsonify
-import sqlite3
+from flask import Flask, request
 
-from services.menu import search_dish, menu_actions, get_category, get_dish
+from services.admin import admin_menu_actions, adm_menu
+from services.menu import search_dish, menu_actions, get_category, get_dish, welcome_page
+from services.orders import start_cart
 from services.users import add_user, login_user, log_out_user, get_user, change_user_password, get_user_orders, \
     get_user_order_by_id
-from utils.sql_lite import SQLiteDB
 
 app = Flask(__name__)
+app.secret_key = "qwerty123456"
 
 
 @app.route("/")
-def welcome_page():
-    return "Welcome"
+def hello():
+    return welcome_page()
 
 
-@app.route("/cart", methods=["GET", "PUT"])
+@app.route("/cart", methods=["GET", "", "PUT"])
 def cart():
-    pass
+    return start_cart()
 
 
 @app.route("/cart/order", methods=["POST"])
@@ -105,9 +106,7 @@ def menu_search():
 
 @app.route("/admin/menu", methods=["GET", "POST", "PUT", "DELETE"])
 def admin_menu():
-    with SQLiteDB("dish.db") as db:
-        data = db.insert_into("Category", {"id": "second", "name": "second"})
-    return str(data)
+    return adm_menu()
 
 
 @app.route("/admin/menu/<cat_name>", methods=["GET", "POST", "PUT", "DELETE"])
@@ -141,4 +140,4 @@ def admin_search():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0")

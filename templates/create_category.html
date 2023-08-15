@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cat</title>
+</head>
+<body>
+{% if session.user_id %}
+Hello {{ session.user_name}}
+<div>
+    <form method="post">
+        <label for="category_name">category</label>
+        <input name="category_name" id="category_name" required>
+        <input type="submit" value="Create category">
+    </form>
+        <form method="put">
+        <label for="old_category_name">old_category_name</label>
+        <input name="old_category_name" id="old_category_name" required>
+        <label for="new_category_name">new_category_name</label>
+        <input name="new_category_name" id="new_category_name" required>
+        <input type="submit" value="Update category">
+    </form>
+</div>
+{% for category in categories %}
+<div>
+    <h2>{{ category.id }}</h2>
+    <p>{{ category.name }}</p>
+</div>
+{% endfor %}
+
+{% else %}
+<a href="/user/sign_in">Sign in</a>
+<br>
+<a href="/user/register">Sign up</a>
+{% endif %}
+<h1>Cat</h1>
+
+</body>
+</html>

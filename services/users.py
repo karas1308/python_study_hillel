@@ -1,8 +1,6 @@
-from flask import request
+from flask import request, session, redirect, render_template
 
 from utils.sql_lite import SQLiteDB
-
-test_user_id = 1
 
 
 def add_user():
@@ -11,95 +9,73 @@ def add_user():
             data = request.form.to_dict()
             db.insert_into("User", data)
         users = db.select_from("User", ["*"])
-    html_form = f"""
-       <form method="POST">
-           <input type="text" name="email" placeholder="email">
-           <input type="text" name="last_name" placeholder="last_name">
-           <input type="text" name="name" placeholder="name">
-           <input type="text" name="password" placeholder="password">
-           <input type="text" name="phone" placeholder="phone">
-           <input type="text" name="tg" placeholder="tg">
-           <input type="type" name="type" placeholder="type">
-           <input type="submit">
-       </form>
-       {str(users)}
-       """
-    return html_form
+    return render_template("register_page.html", users=users)
 
 
 def login_user():
     with SQLiteDB("dish.db") as db:
         if request.method == "POST":
+            if session.get("user_id"):
+                # user logged
+                return redirect("/")
             data = request.form.to_dict()
-            users_data = db.select_from("User", ["phone", "password"], where={"phone": data["phone"]})
+            users_data = db.select_from("User", ["id", "phone", "name", "password", "type"],
+                                        where={"phone": data["phone"]})
             if users_data and users_data[0]["password"] == data["password"]:
-                return "User logged in"
+                session["user_id"] = users_data[0]["id"]
+                session["user_phone"] = users_data[0]["phone"]
+                session["user_type"] = users_data[0]["type"]
+                session["user_name"] = users_data[0]["name"]
+                return redirect("/")
             else:
                 return "якась лажа"
         users = db.select_from("User", ["*"])
-    html_form = f"""
-       <form method="POST">
-           <input type="text" name="password" placeholder="password">
-           <input type="text" name="phone" placeholder="phone">
-           <input type="submit">
-       </form>
-       {str(users)}
-       """
-    return html_form
+    return render_template("login_page.html", users=users)
 
 
 def log_out_user():
     with SQLiteDB("dish.db") as db:
         if request.method == "POST":
-            return "User logged out. Пока пока"
+            session["user_id"] = None
+            session["user_phone"] = None
+            return redirect("/")
+            # return "User logged out. Пока пока"
         users = db.select_from("User", ["*"])
-    html_form = f"""
-       <form method="POST">
-           <input type="submit">
-       </form>
-       {str(users)}
-       """
-    return html_form
+    return render_template("logout_page.html", users=users)
 
 
 def get_user():
+    user = ""
     if request.method == "GET":
-        # /user?phone=3801111111111
-        args = request.args
-        phone = args.get('phone')
-        if phone:
+        if session.get("user_id"):
             with SQLiteDB("dish.db") as db:
-                user = db.select_from("User", ["*"], where={"phone": phone})
-            return user
-        else:
-            return "specify user's phone"
+                user = db.select_from("User", ["*"], where={"id": session["user_id"]})
+    return render_template("user_info.html", user=user)
 
 
 def change_user_password():
     data = request.form.to_dict()
     with SQLiteDB("dish.db") as db:
         if request.method == "POST":
-            db.update_column_value("User", "password", data["new_password"], where={"phone": data["phone"]})
+            db.update_column_value("User", {"password": data["new_password"]}, where={"phone": data["phone"]})
         user = db.select_from("User", ["*"])
-    html_form = f"""
-       <form method="POST">
-           <input type="text" name="phone" placeholder="phone">
-           <input type="text" name="new_password" placeholder="new_password">
-           <input type="submit">
-       </form>
-       {str(user)}
-    """
-    return html_form
+    return render_template("restore_password.html", user=user)
 
 
 def get_user_orders():
     with SQLiteDB("dish.db") as db:
-        orders = db.select_from("Orders", ["*"], where={"user": test_user_id})
-    return orders
+        if session.get("user_id"):
+            orders = db.select_from("Orders", ["*"], where={"user": session["user_id"]})
+            return render_template("user_orders.html", orders=orders)
+        else:
+            return redirect("/user/sign_in")
 
 
 def get_user_order_by_id(order_id):
     # can be used order id only coz it is unique
     with SQLiteDB("dish.db") as db:
-        orders = db.select_from("Orders", ["*"], where=f"user={test_user_id} and id={order_id}")
-    return orders
+        if session.get("user_id"):
+            order = db.select_from("Orders", ["*"], where=f"user={session['user_id']} and id={order_id}")
+            return render_template("user_order.html", orders=order)
+        else:
+            return redirect("/user/sign_in")

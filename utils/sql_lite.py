@@ -15,9 +15,15 @@ class SQLiteDB:
         self.con.commit()
         self.con.close()
 
+    # def __dict_factory(self, cursor, row):
+    #     fields = [column[0] for column in cursor.description]
+    #     return {key: value for key, value in zip(fields, row)}
+
     def __dict_factory(self, cursor, row):
-        fields = [column[0] for column in cursor.description]
-        return {key: value for key, value in zip(fields, row)}
+        d = {}
+        for idx, col in enumerate(cursor.description):
+            d[col[0]] = row[idx]
+        return d
 
     def sql_query(self, query):
         res = self.cur.execute(query)
@@ -41,8 +47,9 @@ class SQLiteDB:
                 query += f" WHERE {where}"
         return self.sql_query(query)
 
-    def update_column_value(self, table, column, value, where=None):
-        query = f"Update {table} SET {column}={value}"
+    def update_column_value(self, table, column_value, where=None):
+        set_values = ', '.join([f"{key}='{value}'" for key, value in column_value.items()])
+        query = f"Update {table} SET {set_values}"
         if where:
             if isinstance(where, dict):
                 where = ', '.join([f"{key}='{value}'" for key, value in where.items()])

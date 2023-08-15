@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Categories</title>
+</head>
+<body>
+{% if session.user_id %}
+Hello {{ session.user_name}}
+{% endif %}
+<h1>Categories</h1>
+<div>
+    {% for category in categories %}
+    <div>
+        <a href="/menu/{{ category.name }}">{{ category.name }}</a>
+    </div>
+    {% endfor %}
+</div>
+
+
+</body>
+</html>
