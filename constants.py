@@ -1,0 +1,5 @@
+status_opened = "opened"
+status_closed = "closed"
+status_paid = "paid"
+status_deleted = "deleted"
+status_delivered = "delivered"

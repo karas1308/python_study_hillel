@@ -6,36 +6,33 @@
 </head>
 <body>
 {% if session.user_id %}
-    Hello {{ session.user_name}}
+Hello {{ session.user_name}}
 {% else %}
 <a href="/user/sign_in">Sign in</a>
 <br>
 <a href="/user/register">Sign up</a>
 {% endif %}
-    <h1>Menu</h1>
+<h1>Menu</h1>
+<h2><a href="{{ url_for('cart')}}"> Cart </a></h2>
 
-    <div>
+<div>
     {% for dish in dishes %}
-        <div>
-            <form method="post">
+    <div>
+        <form method="post">
             <h2>{{ dish.dish_name }}</h2>
             <p>{{ dish.description }}</p>
             <p>{{ dish.category }} category </p>
             <p>{{ dish.price }} $</p>
             <p>{{ dish.ccal }} ccal</p>
-            <button onclick="addToCart(this)" dish_id={{dish.id}} type="submit">Add to Cart </button>
-            </form>
-        </div>
-    {% endfor %}
+            <input type="submit" value="Add to cart" formaction="{{ url_for('cart_add')}} "/>
+            <!--            <input type="number" value={{ dish.id }} id="dish_id" name="dish_id" >-->
+            <input type="number" id={{ dish.id }} name=count value=1 min="1" max="5">
+            <input type="hidden" value={{ dish.id }} id="dish_id" name="dish_id">
+        </form>
     </div>
+    {% endfor %}
+</div>
 
 
 </body>
 </html>
-
-<script>
-function addToCart(button) {
-    fetch('/cart'
-    )
-}
-</script>

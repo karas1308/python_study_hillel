@@ -7,7 +7,7 @@
 </style>
 <head>
     <meta charset="UTF-8">
-    <title>Menu</title>
+    <title>Cart</title>
 </head>
 <body>
 {% if session.user_id %}
@@ -17,8 +17,8 @@ Hello {{ session.user_name}}
 <br>
 <a href="/user/register">Sign up</a>
 {% endif %}
-<h1>Menu</h1>
-<h2><a href="{{ url_for('cart')}}"> Cart </a></h2>
+<h1>Cart</h1>
+<h2> <a href="{{ url_for('menu')}}"> Menu </a></h2>
 <div>
     <div>
         <form method="post">
@@ -39,15 +39,14 @@ Hello {{ session.user_name}}
                 {% for dish in dishes %}
                 <tr>
                     <td><h2><a href="{{ url_for('menu_dish', cat_name=dish.category, dish_id=dish.dish_id) }}"> {{
-                        dish.dish_name }}</a></h2> <input type="submit" value="Add"
-                                                          formaction="{{ url_for('cart_add') }}"></td>
+                        dish.dish_name }}</a></h2> <input type="submit" value="Delete" id="delete" name={{ dish.id }}
+                                                          formaction="{{ url_for('cart_remove') }}"></td>
                     <td>{{ dish.category }} category</td>
                     <td>{{ dish.ccal }} ccal</td>
                     <td>{{ dish.fat }} fat</td>
                     <td>{{ dish.carb }} carb</td>
                     <td>{{ dish.description }}</td>
-                    <td><input type="number" id={{ dish.id }} name=count value=1 min="1" max="5">
-            <input type="hidden" value={{ dish.id }} id="dish_id" name="dish_id">
+                    <td><input type="number" id={{ dish.id }} name={{ dish.id }} value={{ dish.count }} min="0" max="5">
                     </td>
                     <td>{{ dish.price }} $</td>
                     <td>{{ dish.total }}</td>
@@ -59,8 +58,12 @@ Hello {{ session.user_name}}
             <div>
                 <input type="submit" value="Apply changes" formaction="{{ url_for('cart_update')}} "/>
             </div>
+            <div>
+                <input type="submit" value="ORDER" formaction="{{ url_for('cart_order')}} "/>
+            </div>
         </form>
     </div>
+
 </div>
 
 

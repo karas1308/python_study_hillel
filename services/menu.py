@@ -20,9 +20,9 @@ def get_category(cat_name):
     return render_template("categories.html", categories=categories)
 
 
-def get_dish(cat_name, dish_name):
+def get_dish(cat_name, dish_id):
     with SQLiteDB("dish.db") as db:
-        dish = db.select_from("Dishes", ["*"], where=f"category='{cat_name}' AND dish_name='{dish_name}'")
+        dish = db.select_from("Dishes", ["*"], where=f"category='{cat_name}' AND id='{dish_id}'")
     return render_template("menu.html", dishes=dish)
 
 
@@ -31,11 +31,11 @@ def search_dish():
     dishes = ""
     with SQLiteDB("dish.db") as db:
         if request.method == "POST":
-            dishes = db.select_from("Dishes", ["*"], where={"dish_name": data["dish_name"]})
+            dishes = db.select_from("Dishes", ["*"], where={"id": data["dish_id"]})
     return render_template("menu.html", dishes=dishes)
 
 
 def welcome_page():
     with SQLiteDB("dish.db") as db:
         dishes = db.select_from("Dishes", ["*"])
-    return render_template("index.html", dishes=dishes)
+    return render_template("menu.html", dishes=dishes)
