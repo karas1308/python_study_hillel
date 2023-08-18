@@ -12,20 +12,6 @@ dishes_in_cart = []
 def get_cart():
     if session.get("user_id"):
         with SQLiteDB("dish.db") as db:
-            #     if request.method == "POST":
-            #         data = request.form.to_dict()
-            #         if data:
-            #             for dish_id, count in data.items():
-            #                 if count == "Delete":
-            #                     db.delete_from_table("Ordered_dishes", where={"id": dish_id})
-            #                 else:
-            #                     for dish in session["dishes_in_cart"]:
-            #                         if str(dish_id) == str(dish["id"]) and str(count) != str(dish["count"]):
-            #                             if int(count) == 0:
-            #                                 db.delete_from_table("Ordered_dishes", where={"id": dish_id})
-            #                             else:
-            #                                 db.update_column_value("Ordered_dishes", {"count": count},
-            #                                                        where={"id": dish_id})
             cart = db.select_from("Orders", ["id"],
                                   where=f"user={session.get('user_id')} AND status=0", fetch_all=False)
             if cart:
