@@ -33,7 +33,6 @@ Hello {{ session.user_name}}
                     <th>Description</th>
                     <th>Count</th>
                     <th>Price</th>
-                    <th>Total</th>
                     <th>Picture</th>
                 </tr>
                 {% for dish in dishes %}
@@ -47,18 +46,14 @@ Hello {{ session.user_name}}
                     <td>{{ dish.carb }} carb</td>
                     <td>{{ dish.description }}</td>
                     <td><input type="number" id={{ dish.id }} name=count value=1 min="1" max="5">
-            <input type="hidden" value={{ dish.id }} id="dish_id" name="dish_id">
+                        <input type="hidden" value={{ dish.id }} id="dish_id" name="dish_id">
                     </td>
                     <td>{{ dish.price }} $</td>
-                    <td>{{ dish.total }}</td>
                     <td><img src={{ dish.photo }} width="100">
                     </td>
                 </tr>
                 {% endfor %}
             </table>
-            <div>
-                <input type="submit" value="Apply changes" formaction="{{ url_for('cart_update')}} "/>
-            </div>
         </form>
     </div>
 </div>

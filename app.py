@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = "qwerty123456"
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def hello():
     return welcome_page()
 

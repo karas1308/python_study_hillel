@@ -7,7 +7,7 @@ def menu_actions():
     with SQLiteDB("dish.db") as db:
         if request.method == "POST":
             data = request.form.to_dict()
-            data["id"] = data["dish_name"].replace(" ", "_")
+            data["id"] = data["dish_id"].replace(" ", "_")
             data["available"] = 1
             db.insert_into("Dishes", data)
         dishes = db.select_from("Dishes", ["*"])
