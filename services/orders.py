@@ -42,7 +42,7 @@ def get_cart():
                 fields = ["id", "dish_name", "category", "ccal", "fat", "carb", "description", "count", "price",
                           "photo"]
                 ordered_dishes = []
-
+                # transformation RAW to dict
                 for dish in dishes:
                     result_dict = dict.fromkeys(fields)
                     for key, value in zip(result_dict.keys(), dish):
