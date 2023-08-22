@@ -77,9 +77,8 @@ def update_cart_data():
                                     database.db_session.query(OrderedDishes).filter(
                                         OrderedDishes.id == dish_id).update({OrderedDishes.count: count})
                                     database.db_session.commit()
-
-                                    db.update_column_value("Ordered_dishes", {"count": count},
-                                                           where={"id": dish_id})
+                                    # db.update_column_value("Ordered_dishes", {"count": count},
+                                    #                        where={"id": dish_id})
 
 
 def delete_cart_item():
