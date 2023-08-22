@@ -104,7 +104,7 @@ class Orders(Base):
         self.status = status
 
 
-class Category(Base):
+class Statuses(Base):
     __tablename__ = "Statuses"
     id = Column(Integer, primary_key=True, nullable=False)
     status = Column(Integer, nullable=False)
@@ -120,7 +120,7 @@ class User(Base):
     phone = Column(Integer, unique=True, nullable=False)
     email = Column(String, unique=True)
     password = Column(String, nullable=False)
-    tg = Column(String)
+    tg = Column(Integer)
     type = Column(Integer)
     last_name = Column(String)
 

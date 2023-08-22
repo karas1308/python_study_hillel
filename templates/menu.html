@@ -19,6 +19,11 @@ Hello {{ session.user_name}}
 {% endif %}
 <h1>Menu</h1>
 <h2><a href="{{ url_for('cart')}}"> Cart </a></h2>
+<form method="post">
+<input type="search" name="search" id="search">
+<input type="submit" value="Search" id="Search dish" formaction="{{ url_for('menu_search') }}" >
+</form>
+<br>
 <div>
     <div>
         <form method="post">
