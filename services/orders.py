@@ -7,8 +7,6 @@ from utils import database
 from utils.db_models import Orders, OrderedDishes, Dishes
 from utils.sql_lite import SQLiteDB
 
-dishes_in_cart = []
-
 
 def get_cart():
     database.init_db()
@@ -62,6 +60,7 @@ def get_cart():
 
 def update_cart_data():
     if session.get("user_id"):
+        database.init_db()
         with SQLiteDB("dish.db") as db:
             if request.method == "POST":
                 data = request.form.to_dict()
@@ -70,8 +69,15 @@ def update_cart_data():
                         for dish in session["dishes_in_cart"]:
                             if str(dish_id) == str(dish["id"]) and str(count) != str(dish["count"]):
                                 if int(count) == 0:
-                                    db.delete_from_table("Ordered_dishes", where={"id": dish_id})
+                                    database.db_session.query(OrderedDishes).where(
+                                        OrderedDishes.id == int(dish_id)).delete()
+                                    database.db_session.commit()
+                                    # db.delete_from_table("Ordered_dishes", where={"id": dish_id})
                                 else:
+                                    database.db_session.query(OrderedDishes).filter(
+                                        OrderedDishes.id == dish_id).update({OrderedDishes.count: count})
+                                    database.db_session.commit()
+
                                     db.update_column_value("Ordered_dishes", {"count": count},
                                                            where={"id": dish_id})
 

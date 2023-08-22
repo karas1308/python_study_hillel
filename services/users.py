@@ -74,7 +74,7 @@ def change_user_password():
     if request.method == "POST":
         database.init_db()
         if data.get("password"):
-            database.db_session.query(User).update(User.password == data.get("password"))
+            database.db_session.query(User).update({User.password == data.get("password")})
         else:
             return "Password can not be empty"
     users = database.db_session.query(User).all()
