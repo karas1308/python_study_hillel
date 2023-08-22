@@ -79,7 +79,6 @@ def user_orders_history():
 
 @app.route("/user/orders/<order_id>", methods=["GET"])
 def user_order(order_id):
-    order_id = 1
     return get_user_order_by_id(order_id)
 
 

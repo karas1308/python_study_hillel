@@ -1,7 +1,7 @@
 from flask import request, session, redirect, render_template
 
 from utils import database
-from utils.db_models import User
+from utils.db_models import User, Orders
 from utils.sql_lite import SQLiteDB
 
 
@@ -82,19 +82,22 @@ def change_user_password():
 
 
 def get_user_orders():
-    with SQLiteDB("dish.db") as db:
-        if session.get("user_id"):
-            orders = db.select_from("Orders", ["*"], where={"user": session["user_id"]})
+    if session.get("user_id"):
+        database.init_db()
+        orders = database.db_session.query(Orders).where(Orders.user == session["user_id"]).all()
+        if orders:
             return render_template("user_orders.html", orders=orders)
         else:
-            return redirect("/user/sign_in")
+            return "No orders"
+    return redirect("/user/sign_in")
 
 
 def get_user_order_by_id(order_id):
     # can be used order id only coz it is unique
-    with SQLiteDB("dish.db") as db:
-        if session.get("user_id"):
-            order = db.select_from("Orders", ["*"], where=f"user={session['user_id']} and id={order_id}")
-            return render_template("user_order.html", orders=order)
-        else:
-            return redirect("/user/sign_in")
+    database.init_db()
+    if session.get("user_id"):
+        order = database.db_session.query(Orders).where(
+            (Orders.user == session["user_id"]) & (Orders.id == order_id)).one()
+        return render_template("user_order.html", order=order)
+    else:
+        return redirect("/user/sign_in")
