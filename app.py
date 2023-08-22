@@ -1,6 +1,6 @@
 from flask import Flask, request, url_for
 
-from services.admin import admin_category_actions
+from services.admin import admin_category_actions, admin_menu_actions
 from services.menu import search_dish, menu_actions, get_category, get_dish, welcome_page
 from services.orders import get_cart, update_cart_data, delete_cart_item, add_cart_item, make_order
 from services.users import add_user, login_user, log_out_user, get_user, change_user_password, get_user_orders, \
@@ -120,19 +120,24 @@ def menu_search():
     return search_dish()
 
 
-@app.route("/admin/menu", methods=["GET", "POST", "PUT", "DELETE"])
-def admin_menu():
+@app.route("/admin/menu/category", methods=["GET", "POST"])
+def admin_menu_category():
     return admin_category_actions()
 
 
-@app.route("/admin/menu/<cat_name>", methods=["GET", "POST", "PUT", "DELETE"])
-def admin_menu_category(cat_name):
+@app.route("/admin/menu", methods=["GET", "POST"])
+def admin_menu():
+    return admin_menu_actions()
+
+
+@app.route("/admin/menu/<cat_name>", methods=["GET", "POST"])
+def admin_menu_category_name(cat_name):
     if request.method == "GET":
         # /admin/menu/first
         return menu_category(cat_name)
 
 
-@app.route("/admin/menu/<cat_name>/<dish>", methods=["GET", "POST", "PUT", "DELETE"])
+@app.route("/admin/menu/<cat_name>/<dish>", methods=["GET", "POST"])
 def admin_menu_dish(cat_name, dish):
     pass
 

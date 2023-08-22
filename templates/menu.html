@@ -37,16 +37,18 @@ Hello {{ session.user_name}}
                 </tr>
                 {% for dish in dishes %}
                 <tr>
-                    <td><h2><a href="{{ url_for('menu_dish', cat_name=dish.category, dish_id=dish.dish_id) }}"> {{
-                        dish.dish_name }}</a></h2> <input type="submit" value="Add"
-                                                          formaction="{{ url_for('cart_add') }}"></td>
+                    <td><h2><a href="{{ url_for('menu_dish', cat_name=dish.category, dish_id=dish.id) }}"> {{
+                        dish.dish_name }}</a></h2> <input type="submit" name={{ dish.id }} value="Add"
+                                                          formaction="{{ url_for('cart_add') }} ">
+
+                    </td>
                     <td>{{ dish.category }} category</td>
                     <td>{{ dish.ccal }} ccal</td>
                     <td>{{ dish.fat }} fat</td>
                     <td>{{ dish.carb }} carb</td>
                     <td>{{ dish.description }}</td>
-                    <td><input type="number" id={{ dish.id }} name=count value=1 min="1" max="5">
-                        <input type="hidden" value={{ dish.id }} id="dish_id" name="dish_id">
+                    <td><input type="number" id={{ dish.id }} name=count_{{ dish.id }} value=0 min="0" max="5">
+<!--                        <input type="hidden" value="ADDD" id="dish_id" name={{ dish.id }}>-->
                     </td>
                     <td>{{ dish.price }} $</td>
                     <td><img src={{ dish.photo }} width="100">

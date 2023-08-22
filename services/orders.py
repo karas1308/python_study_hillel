@@ -73,10 +73,17 @@ def add_cart_item():
                                           where=f"user={session.get('user_id')} AND status=0", fetch_all=False)
                 session["cart_id"] = cart["id"]
                 ordered_dish = {
-                    "count": data["count"],
+                    "count": 1,
                     "order_id": cart["id"],
-                    "dish_id": data["dish_id"]
+                    "dish_id": ""
                 }
+                for key, value in data.items():
+                    if value == "Add":
+                        ordered_dish["dish_id"] = key
+                for key, value in data.items():
+                    if key.startswith("count_") and key.replace("count_", "") == ordered_dish["dish_id"]:
+                        if int(value):
+                            ordered_dish["count"] = int(value)
                 db.insert_into("Ordered_dishes", ordered_dish)
 
 
