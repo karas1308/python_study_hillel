@@ -13,18 +13,10 @@ def get_cart():
     utils.db_models.init_db()
     if session.get("user_id"):
         with (SQLiteDB("dish.db") as db):
-            # cart = db.select_from("Orders", ["id"],
-            #                       where=f"user={session.get('user_id')} AND status=0", fetch_all=False)
             cart = utils.db_models.db_session.query(Orders).where(
                 (Orders.user == session["user_id"]) & (Orders.status == 0)).one_or_none()
             if cart:
                 session["cart_id"] = cart.id
-                field_to_select = ("dish_name, category, ccal, fat, carb, description, count, price, photo, "
-                                   "Ordered_dishes.id as id")
-                # dishes = db.select_from(row_query=f"SELECT {field_to_select} from Ordered_dishes JOIN Dishes on "
-                #                                   f"Dishes.id = Ordered_dishes.dish_id WHERE "
-                #                                   f"Ordered_dishes.order_id = {cart['id']}")
-
                 dishes = utils.db_models.db_session.query(OrderedDishes.id,
                                                           Dishes.dish_name,
                                                           Dishes.category,
@@ -67,13 +59,10 @@ def update_cart_data():
                                     utils.db_models.db_session.query(OrderedDishes).where(
                                         OrderedDishes.id == int(dish_id)).delete()
                                     utils.db_models.db_session.commit()
-                                    # db.delete_from_table("Ordered_dishes", where={"id": dish_id})
                                 else:
                                     utils.db_models.db_session.query(OrderedDishes).filter(
                                         OrderedDishes.id == dish_id).update({OrderedDishes.count: count})
                                     utils.db_models.db_session.commit()
-                                    # db.update_column_value("Ordered_dishes", {"count": count},
-                                    #                        where={"id": dish_id})
 
 
 def delete_cart_item():
