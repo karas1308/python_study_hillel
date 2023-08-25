@@ -4,6 +4,7 @@ from flask import session, render_template, request
 
 import utils.db_models
 from logger import log
+from utils.common import transformation_raw_to_dict
 from utils.db_models import Orders, OrderedDishes, Dishes
 from utils.sql_lite import SQLiteDB
 
@@ -39,13 +40,7 @@ def get_cart():
 
                 fields = ["id", "dish_name", "category", "ccal", "fat", "carb", "description", "count", "price",
                           "photo"]
-                ordered_dishes = []
-                # transformation RAW to dict
-                for dish in dishes:
-                    result_dict = dict.fromkeys(fields)
-                    for key, value in zip(result_dict.keys(), dish):
-                        result_dict[key] = value
-                    ordered_dishes.append(result_dict)
+                ordered_dishes = transformation_raw_to_dict(fields, dishes)
                 session["dishes_in_cart"] = ordered_dishes
                 for dish in ordered_dishes:
                     dish["total"] = dish["count"] * dish["price"]
@@ -125,7 +120,8 @@ def create_new_order():
             if request.method == "POST":
                 data = {
                     "user": int(session.get("user_id")),
-                    "order_date": str(datetime.utcnow())
+                    "order_date": str(datetime.utcnow()),
+                    "status": 0
                 }
                 db.insert_into("Orders", data)
                 log.info("Order created")

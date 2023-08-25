@@ -9,10 +9,10 @@
 {% if session.user_id %}
 Hello {{ session.user_name}}
 <div>
-    <h2>{{ user[0].name }} name</h2>
-    <p>{{ user[0].id }} id</p>
-    <p>{{ user[0].phone }} phone</p>
-    <p>{{ user[0].password }} password</p>
+    <h2>{{ user.name }} name</h2>
+    <p>{{ user.id }} id</p>
+    <p>{{ user.phone }} phone</p>
+    <p>{{ user.password }} password</p>
 </div>
 {% else %}
 <a href="/user/sign_in">Sign in</a>

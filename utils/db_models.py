@@ -1,4 +1,7 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, create_engine
+import uuid
+from datetime import datetime, timedelta
+
+from sqlalchemy import Column, Integer, ForeignKey, String, create_engine, DateTime
 from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 
 engine = create_engine("sqlite:///dish.db")
@@ -14,7 +17,7 @@ def init_db():
 
 class Address(Base):
     __tablename__ = "Address"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     town = Column(String(100), nullable=False)
     street = Column(String(250), nullable=False)
     building = Column(Integer, nullable=False)
@@ -35,8 +38,8 @@ class Address(Base):
 
 class Category(Base):
     __tablename__ = "Category"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250))
+    id = Column(String(100), primary_key=True)
+    name = Column(String(100))
 
     def __init__(self, name=None):
         self.name = name
@@ -44,7 +47,7 @@ class Category(Base):
 
 class Dishes(Base):
     __tablename__ = "Dishes"
-    id = Column(Integer, primary_key=True)
+    id = Column(String(250), primary_key=True)
     dish_name = Column(String(250))
     price = Column(Integer)
     description = Column(String(1000))
@@ -70,9 +73,22 @@ class Dishes(Base):
         self.category = category
 
 
+class EmailVerification(Base):
+    __tablename__ = "Email_verification"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("User.id"), nullable=False)
+    code = Column(String(36))
+    expire_at = Column(DateTime)
+
+    def __init__(self, user_id=None):
+        self.user_id = user_id
+        self.code = str(uuid.uuid4())
+        self.expire_at = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 class OrderedDishes(Base):
     __tablename__ = "Ordered_dishes"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     count = Column(Integer)
     order_id = Column(Integer, ForeignKey("Orders.id"))
     dish_id = Column(String, ForeignKey("Dishes.id"))
@@ -85,7 +101,7 @@ class OrderedDishes(Base):
 
 class Orders(Base):
     __tablename__ = "Orders"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     user = Column(Integer, ForeignKey("User.id"))
     address = Column(Integer, ForeignKey("Address.id"))
     total = Column(Integer)
@@ -94,9 +110,9 @@ class Orders(Base):
     carb = Column(Integer)
     fat = Column(Integer)
     comment = Column(String(250))
-    order_date = Column(String(20))
+    order_date = Column(DateTime(20))
     rate = Column(Integer)
-    status = Column(Integer)
+    status = Column(Integer, ForeignKey("Statuses.id"))
 
     def __init__(self, user=None, address=None, total=None, ccal=None, protein=None, carb=None,
                  fat=None, comment=None, order_date=None, rate=None, status=None):
@@ -115,7 +131,7 @@ class Orders(Base):
 
 class Statuses(Base):
     __tablename__ = "Statuses"
-    id = Column(Integer, primary_key=True, nullable=False)
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     status = Column(Integer, nullable=False)
 
     def __init__(self, status=None):
@@ -124,14 +140,14 @@ class Statuses(Base):
 
 class User(Base):
     __tablename__ = "User"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False)
     phone = Column(Integer, unique=True, nullable=False)
-    email = Column(String, unique=True)
+    email = Column(String(50), unique=True)
     password = Column(String, nullable=False)
     tg = Column(Integer)
     type = Column(Integer)
-    last_name = Column(String)
+    last_name = Column(String(50))
 
     def __init__(self, name=None, phone=None, email=None, password=None, tg=None, last_name=None):
         self.name = name

@@ -12,9 +12,16 @@ Hello {{ session.user_name}}
 <div>
     <h2><a href="{{ url_for('user_order', order_id=order.id) }}"> {{
                         order.id }}</a></h2>
-    <p>{{ order.description }}</p>
-    <p>{{ order.total }} $</p>
-    <p>{{ order.order_date }}</p>
+    <p>{{ order.order_date }} DATE </p>
+    {% for dish in order.dishes %}
+    <p>{{ dish.dish_name }}</p>
+    <p>{{ dish.price }}</p>
+    <p>{{ dish.count }}</p>
+    <p>{{ dish.description }}</p>
+
+    {% endfor %}
+    <p>{{ order.total }} ORDER TOTAL $</p>
+    <p>{{ order.total_ccal }} ORDER TOTAL CCAL $</p>
 </div>
 {% endfor %}
 {% else %}
