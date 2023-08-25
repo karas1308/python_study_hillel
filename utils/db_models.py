@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Integer, ForeignKey, String, create_engine, DateTime
+from sqlalchemy import Column, Integer, ForeignKey, String, create_engine, DateTime, Boolean
 from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 
 engine = create_engine("sqlite:///dish.db")
@@ -148,6 +148,7 @@ class User(Base):
     tg = Column(Integer)
     type = Column(Integer)
     last_name = Column(String(50))
+    verified = Column(Boolean)
 
     def __init__(self, name=None, phone=None, email=None, password=None, tg=None, last_name=None):
         self.name = name
@@ -157,3 +158,4 @@ class User(Base):
         self.tg = tg
         self.type = 1
         self.last_name = last_name
+        self.verified = False
