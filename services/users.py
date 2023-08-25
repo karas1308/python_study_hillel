@@ -1,12 +1,12 @@
 from flask import request, session, redirect, render_template
 
-from utils import database
+import utils.db_models
 from utils.db_models import User, Orders
 from utils.sql_lite import SQLiteDB
 
 
 def add_user():
-    database.init_db()
+    utils.db_models.init_db()
     with SQLiteDB("dish.db") as db:
         if request.method == "POST":
             data = request.form.to_dict()
@@ -18,21 +18,21 @@ def add_user():
                 tg=data.get("tg"),
                 last_name=data.get("last_name"),
             )
-            database.db_session.add(user)
-            database.db_session.commit()
-        users = database.db_session.query(User).all()
+            utils.db_models.db_session.add(user)
+            utils.db_models.db_session.commit()
+        users = utils.db_models.db_session.query(User).all()
     return render_template("register_page.html", users=users)
 
 
 def login_user():
-    database.init_db()
+    utils.db_models.init_db()
     if request.method == "POST":
         if session.get("user_id"):
             # user logged
             return redirect("/")
         data = request.form.to_dict()
         fields = ["id", "phone", "name", "password", "type"]
-        users_data = (database.db_session.query(User.id, User.phone, User.name, User.password, User.type)
+        users_data = (utils.db_models.db_session.query(User.id, User.phone, User.name, User.password, User.type)
                       .where(User.phone == data["phone"]).one())
         result_dict = dict.fromkeys(fields)
         for key, value in zip(result_dict.keys(), users_data):
@@ -45,7 +45,7 @@ def login_user():
             return redirect("/")
         else:
             return "якась лажа"
-    users = database.db_session.query(User).all()
+    users = utils.db_models.db_session.query(User).all()
     return render_template("login_page.html", users=users)
 
 
@@ -55,15 +55,15 @@ def log_out_user():
         session["user_phone"] = None
         return redirect("/")
         # return "User logged out. Пока пока"
-    database.init_db()
-    users = database.db_session.query(User).all()
+    utils.db_models.init_db()
+    users = utils.db_models.db_session.query(User).all()
     return render_template("logout_page.html", users=users)
 
 
 def get_user():
     if session.get("user_id"):
-        database.init_db()
-        user = database.db_session.query(User).where(User.id == session["user_id"]).one()
+        utils.db_models.init_db()
+        user = utils.db_models.db_session.query(User).where(User.id == session["user_id"]).one()
         return render_template("user_info.html", user=user)
     else:
         return redirect("/")
@@ -72,19 +72,19 @@ def get_user():
 def change_user_password():
     data = request.form.to_dict()
     if request.method == "POST":
-        database.init_db()
+        utils.db_models.init_db()
         if data.get("password"):
-            database.db_session.query(User).update({User.password == data.get("password")})
+            utils.db_models.db_session.query(User).update({User.password == data.get("password")})
         else:
             return "Password can not be empty"
-    users = database.db_session.query(User).all()
+    users = utils.db_models.db_session.query(User).all()
     return render_template("restore_password.html", user=users)
 
 
 def get_user_orders():
     if session.get("user_id"):
-        database.init_db()
-        orders = database.db_session.query(Orders).where(Orders.user == session["user_id"]).all()
+        utils.db_models.init_db()
+        orders = utils.db_models.db_session.query(Orders).where(Orders.user == session["user_id"]).all()
         if orders:
             return render_template("user_orders.html", orders=orders)
         else:
@@ -94,9 +94,9 @@ def get_user_orders():
 
 def get_user_order_by_id(order_id):
     # can be used order id only coz it is unique
-    database.init_db()
+    utils.db_models.init_db()
     if session.get("user_id"):
-        order = database.db_session.query(Orders).where(
+        order = utils.db_models.db_session.query(Orders).where(
             (Orders.user == session["user_id"]) & (Orders.id == order_id)).one()
         return render_template("user_order.html", order=order)
     else:

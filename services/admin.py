@@ -2,7 +2,8 @@ from sqlite3 import IntegrityError
 
 from flask import session, request, render_template, redirect
 
-from utils import database, db_models
+import utils.db_models
+from utils import db_models
 from utils.sql_lite import SQLiteDB
 
 
@@ -30,7 +31,7 @@ def admin_category_actions():
 
 
 def admin_menu_actions():
-    database.init_db()
+    utils.db_models.init_db()
     if request.method == "POST":
         data = request.form.to_dict()
         dish = db_models.Dishes(
@@ -47,7 +48,7 @@ def admin_menu_actions():
             category=data.get("category")
 
         )
-        database.db_session.add(dish)
-        database.db_session.commit()
-    dishes = database.db_session.query(db_models.Dishes).all()
+        utils.db_models.db_session.add(dish)
+        utils.db_models.db_session.commit()
+    dishes = utils.db_models.db_session.query(db_models.Dishes).all()
     return render_template("add_dish.html", dishes=dishes)

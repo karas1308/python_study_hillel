@@ -2,19 +2,19 @@ from datetime import datetime
 
 from flask import session, render_template, request
 
+import utils.db_models
 from logger import log
-from utils import database
 from utils.db_models import Orders, OrderedDishes, Dishes
 from utils.sql_lite import SQLiteDB
 
 
 def get_cart():
-    database.init_db()
+    utils.db_models.init_db()
     if session.get("user_id"):
         with (SQLiteDB("dish.db") as db):
             # cart = db.select_from("Orders", ["id"],
             #                       where=f"user={session.get('user_id')} AND status=0", fetch_all=False)
-            cart = database.db_session.query(Orders).where(
+            cart = utils.db_models.db_session.query(Orders).where(
                 (Orders.user == session["user_id"]) & (Orders.status == 0)).one_or_none()
             if cart:
                 session["cart_id"] = cart.id
@@ -24,17 +24,17 @@ def get_cart():
                 #                                   f"Dishes.id = Ordered_dishes.dish_id WHERE "
                 #                                   f"Ordered_dishes.order_id = {cart['id']}")
 
-                dishes = database.db_session.query(OrderedDishes.id,
-                                                   Dishes.dish_name,
-                                                   Dishes.category,
-                                                   Dishes.ccal,
-                                                   Dishes.fat,
-                                                   Dishes.carb,
-                                                   Dishes.description,
-                                                   OrderedDishes.count,
-                                                   Dishes.price,
-                                                   Dishes.photo,
-                                                   ).join(Dishes, Dishes.id == OrderedDishes.dish_id).filter(
+                dishes = utils.db_models.db_session.query(OrderedDishes.id,
+                                                          Dishes.dish_name,
+                                                          Dishes.category,
+                                                          Dishes.ccal,
+                                                          Dishes.fat,
+                                                          Dishes.carb,
+                                                          Dishes.description,
+                                                          OrderedDishes.count,
+                                                          Dishes.price,
+                                                          Dishes.photo,
+                                                          ).join(Dishes, Dishes.id == OrderedDishes.dish_id).filter(
                     OrderedDishes.order_id == cart.id).all()
 
                 fields = ["id", "dish_name", "category", "ccal", "fat", "carb", "description", "count", "price",
@@ -60,7 +60,7 @@ def get_cart():
 
 def update_cart_data():
     if session.get("user_id"):
-        database.init_db()
+        utils.db_models.init_db()
         with SQLiteDB("dish.db") as db:
             if request.method == "POST":
                 data = request.form.to_dict()
@@ -69,14 +69,14 @@ def update_cart_data():
                         for dish in session["dishes_in_cart"]:
                             if str(dish_id) == str(dish["id"]) and str(count) != str(dish["count"]):
                                 if int(count) == 0:
-                                    database.db_session.query(OrderedDishes).where(
+                                    utils.db_models.db_session.query(OrderedDishes).where(
                                         OrderedDishes.id == int(dish_id)).delete()
-                                    database.db_session.commit()
+                                    utils.db_models.db_session.commit()
                                     # db.delete_from_table("Ordered_dishes", where={"id": dish_id})
                                 else:
-                                    database.db_session.query(OrderedDishes).filter(
+                                    utils.db_models.db_session.query(OrderedDishes).filter(
                                         OrderedDishes.id == dish_id).update({OrderedDishes.count: count})
-                                    database.db_session.commit()
+                                    utils.db_models.db_session.commit()
                                     # db.update_column_value("Ordered_dishes", {"count": count},
                                     #                        where={"id": dish_id})
 

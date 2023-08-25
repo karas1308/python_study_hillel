@@ -1,6 +1,15 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, ForeignKey, String, create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 
-from utils.database import Base
+engine = create_engine("sqlite:///dish.db")
+db_session = scoped_session(sessionmaker(autoflush=False, autocommit=False, bind=engine))
+
+Base = declarative_base()
+Base.query = db_session.query_property()
+
+
+def init_db():
+    Base.metadata.create_all(bind=engine)
 
 
 class Address(Base):
