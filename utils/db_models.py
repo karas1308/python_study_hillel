@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, ForeignKey, String, create_engine, DateTime, Boolean
 from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 
-engine = create_engine("sqlite:///dish.db")
+engine = create_engine("postgresql://postgres:postgres@pg_db:5432/dish")
 db_session = scoped_session(sessionmaker(autoflush=False, autocommit=False, bind=engine))
 
 Base = declarative_base()

@@ -1,0 +1,23 @@
+services:
+  web_app:
+    container_name: flask_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    depends_on:
+      - db_container
+
+  db_container:
+    hostname: pg_db
+    container_name: pg_db
+    build:
+      context: .
+      dockerfile: Dockerfile_pg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dish
+    ports:
+      - 5432:5432

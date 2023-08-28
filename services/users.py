@@ -8,20 +8,19 @@ from utils.sql_lite import SQLiteDB
 
 def add_user():
     utils.db_models.init_db()
-    with SQLiteDB("dish.db") as db:
-        if request.method == "POST":
-            data = request.form.to_dict()
-            user = User(
-                name=data.get("name"),
-                phone=data.get("phone"),
-                email=data.get("email"),
-                password=data.get("password"),
-                tg=data.get("tg"),
-                last_name=data.get("last_name"),
-            )
-            utils.db_models.db_session.add(user)
-            utils.db_models.db_session.commit()
-        users = utils.db_models.db_session.query(User).all()
+    if request.method == "POST":
+        data = request.form.to_dict()
+        user = User(
+            name=data.get("name"),
+            phone=data.get("phone"),
+            email=data.get("email"),
+            password=data.get("password"),
+            tg=data.get("tg"),
+            last_name=data.get("last_name"),
+        )
+        utils.db_models.db_session.add(user)
+        utils.db_models.db_session.commit()
+    users = utils.db_models.db_session.query(User).all()
     return render_template("register_page.html", users=users)
 
 

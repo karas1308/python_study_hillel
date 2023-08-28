@@ -12,37 +12,36 @@ from utils.sql_lite import SQLiteDB
 def get_cart():
     utils.db_models.init_db()
     if session.get("user_id"):
-        with (SQLiteDB("dish.db") as db):
-            cart = utils.db_models.db_session.query(Orders).where(
-                (Orders.user == session["user_id"]) & (Orders.status == 0)).one_or_none()
-            if cart:
-                session["cart_id"] = cart.id
-                dishes = utils.db_models.db_session.query(OrderedDishes.id,
-                                                          Dishes.dish_name,
-                                                          Dishes.category,
-                                                          Dishes.ccal,
-                                                          Dishes.fat,
-                                                          Dishes.carb,
-                                                          Dishes.description,
-                                                          OrderedDishes.count,
-                                                          Dishes.price,
-                                                          Dishes.photo,
-                                                          ).join(Dishes, Dishes.id == OrderedDishes.dish_id).filter(
-                    OrderedDishes.order_id == cart.id).all()
+        cart = utils.db_models.db_session.query(Orders).where(
+            (Orders.user == session["user_id"]) & (Orders.status == 0)).one_or_none()
+        if cart:
+            session["cart_id"] = cart.id
+            dishes = utils.db_models.db_session.query(OrderedDishes.id,
+                                                      Dishes.dish_name,
+                                                      Dishes.category,
+                                                      Dishes.ccal,
+                                                      Dishes.fat,
+                                                      Dishes.carb,
+                                                      Dishes.description,
+                                                      OrderedDishes.count,
+                                                      Dishes.price,
+                                                      Dishes.photo,
+                                                      ).join(Dishes, Dishes.id == OrderedDishes.dish_id).filter(
+                OrderedDishes.order_id == cart.id).all()
 
-                fields = ["id", "dish_name", "category", "ccal", "fat", "carb", "description", "count", "price",
-                          "photo"]
-                ordered_dishes = transformation_raw_to_dict(fields, dishes)
-                session["dishes_in_cart"] = ordered_dishes
-                for dish in ordered_dishes:
-                    dish["total"] = dish["count"] * dish["price"]
-                    dish["fat"] = dish["count"] * dish["fat"]
-                    dish["carb"] = dish["count"] * dish["carb"]
-                    dish["ccal"] = dish["count"] * dish["ccal"]
+            fields = ["id", "dish_name", "category", "ccal", "fat", "carb", "description", "count", "price",
+                      "photo"]
+            ordered_dishes = transformation_raw_to_dict(fields, dishes)
+            session["dishes_in_cart"] = ordered_dishes
+            for dish in ordered_dishes:
+                dish["total"] = dish["count"] * dish["price"]
+                dish["fat"] = dish["count"] * dish["fat"]
+                dish["carb"] = dish["count"] * dish["carb"]
+                dish["ccal"] = dish["count"] * dish["ccal"]
 
-                return render_template("cart.html", dishes=ordered_dishes)
-            else:
-                return "Cart is empty"
+            return render_template("cart.html", dishes=ordered_dishes)
+        else:
+            return "Cart is empty"
 
 
 def update_cart_data():
