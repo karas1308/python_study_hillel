@@ -3,7 +3,6 @@ from flask import request, session, redirect, render_template
 import utils.db_models
 from utils.common import transformation_raw_to_dict
 from utils.db_models import User, Orders, OrderedDishes, Dishes
-from utils.sql_lite import SQLiteDB
 
 
 def add_user():

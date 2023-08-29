@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, ForeignKey, String, create_engine, DateT
 from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 
 engine = create_engine("postgresql://postgres:postgres@pg_db:5432/dish")
+# engine = create_engine("sqlite:///dish.db")
 db_session = scoped_session(sessionmaker(autoflush=False, autocommit=False, bind=engine))
 
 Base = declarative_base()
@@ -41,7 +42,8 @@ class Category(Base):
     id = Column(String(100), primary_key=True)
     name = Column(String(100))
 
-    def __init__(self, name=None):
+    def __init__(self, cat_id=None, name=None):
+        self.id = cat_id
         self.name = name
 
 
@@ -59,8 +61,10 @@ class Dishes(Base):
     carb = Column(Integer)
     category = Column(String, ForeignKey("Category.id"))
 
-    def __init__(self, dish_name=None, price=None, description=None, available=None, photo=None, ccal=None,
+    def __init__(self, dish_id=None, dish_name=None, price=None, description=None, available=None, photo=None,
+                 ccal=None,
                  protein=None, fat=None, carb=None, category=None):
+        self.id = dish_id
         self.dish_name = dish_name
         self.price = price
         self.description = description
@@ -124,7 +128,7 @@ class Orders(Base):
         self.carb = carb
         self.fat = fat
         self.comment = comment
-        self.order_date = order_date
+        self.order_date = order_date or datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         self.rate = rate
         self.status = status
 
