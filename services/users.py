@@ -1,8 +1,10 @@
-from flask import request, session, redirect, render_template
+from flask import redirect, render_template, request, session
 
 import utils.db_models
+from celery_tasks import send_email
+from constants import user_confirm_body
 from utils.common import transformation_raw_to_dict
-from utils.db_models import User, Orders, OrderedDishes, Dishes
+from utils.db_models import Dishes, EmailVerification, OrderedDishes, Orders, User
 
 
 def add_user():
@@ -19,6 +21,8 @@ def add_user():
         )
         utils.db_models.db_session.add(user)
         utils.db_models.db_session.commit()
+        user_data = utils.db_models.db_session.query(User.id).where(User.phone == data["phone"]).one()
+        send_confirmation(user_data.id, user)
     users = utils.db_models.db_session.query(User).all()
     return render_template("register_page.html", users=users)
 
@@ -131,3 +135,11 @@ def get_user_order_by_id(order_id):
         return render_template("user_order.html", order=order)
     else:
         return redirect("/user/sign_in")
+
+
+def send_confirmation(user_id, user):
+    email_verification = EmailVerification(user_id=user_id)
+    utils.db_models.db_session.add(email_verification)
+    utils.db_models.db_session.commit()
+    body = user_confirm_body.format(user_id, email_verification.code)
+    send_email.delay(user.email, body)
