@@ -36,7 +36,7 @@ Hello {{ session.user_name}}
                     <th>Total</th>
                     <th>Picture</th>
                 </tr>
-                {% for dish in dishes %}
+                {% for dish in dishes.ordered_dishes %}
                 <tr>
                     <td><h2><a href="{{ url_for('menu_dish', cat_name=dish.category, dish_id=dish.dish_id) }}"> {{
                         dish.dish_name }}</a></h2> <input type="submit" value="Delete" id="delete" name={{ dish.id }}

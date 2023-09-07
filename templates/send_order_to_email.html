@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>
+<body>
+    <div>
+        <h2>Please, check your order.</h2>
+    </div>
+<div>
+    <div>
+            <table style="width:50%">
+
+                <tr>
+                    <th>Dish name</th>
+                    <th>Ccal</th>
+                    <th>Fat</th>
+                    <th>Carb</th>
+                    <th>Description</th>
+                    <th>Count</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+                {% for dish in dishes.ordered_dishes %}
+                <tr>{{dish.dish_name }}</td>
+                <td>{{ dish.ccal }} ccal</td>
+                <td>{{ dish.fat }} fat</td>
+                <td>{{ dish.carb }} carb</td>
+                <td>{{ dish.description }}</td>
+                <td>{{ dish.count }}</td>
+                <td>{{ dish.price }} $</td>
+                <td>{{ dish.total }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+    <div>
+        <h2>Order TOTAL {{ dishes.order_total }} $</h2>
+    </div>
+    </div>
+
+
+</div>
+
+
+</body>
+</html>
+

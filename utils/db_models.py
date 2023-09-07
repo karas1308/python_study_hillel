@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, ForeignKey, String, create_engine, DateT
 from sqlalchemy.orm import scoped_session, sessionmaker, declarative_base
 
 engine = create_engine("postgresql://postgres:postgres@pg_db:5432/dish")
+# engine = create_engine("postgresql://postgres:postgres@localhost:5432/dish")
 # engine = create_engine("sqlite:///dish.db")
 db_session = scoped_session(sessionmaker(autoflush=False, autocommit=False, bind=engine))
 
@@ -87,7 +88,7 @@ class EmailVerification(Base):
     def __init__(self, user_id=None):
         self.user_id = user_id
         self.code = str(uuid.uuid4())
-        self.expire_at = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        self.expire_at = datetime.utcnow() + timedelta(days=1)
 
 
 class OrderedDishes(Base):

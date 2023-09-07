@@ -1,11 +1,10 @@
 from flask import Flask, request, url_for
 
-
 from services.admin import admin_category_actions, admin_menu_actions
-from services.menu import search_dish, menu_actions, get_category, get_dish, welcome_page
-from services.orders import get_cart, update_cart_data, delete_cart_item, add_cart_item, make_order
-from services.users import add_user, login_user, log_out_user, get_user, change_user_password, get_user_orders, \
-    get_user_order_by_id
+from services.menu import get_category, get_dish, menu_actions, search_dish, welcome_page
+from services.orders import add_cart_item, delete_cart_item, get_cart, make_order, update_cart_data
+from services.users import add_user, change_user_password, get_user, get_user_order_by_id, get_user_orders, \
+    log_out_user, login_user
 
 app = Flask(__name__)
 app.secret_key = "qwerty123456"

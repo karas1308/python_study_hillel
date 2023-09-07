@@ -1,11 +1,12 @@
 from datetime import datetime
 
-from flask import session, render_template, request
+from flask import render_template, request, session
 
 import utils.db_models
 from logger import log
-from utils.common import transformation_raw_to_dict, check_is_admin
-from utils.db_models import Orders, OrderedDishes, Dishes
+from services.users import send_order_notification
+from utils.common import transformation_raw_to_dict
+from utils.db_models import Dishes, OrderedDishes, Orders
 
 
 def get_cart():
@@ -15,29 +16,7 @@ def get_cart():
             (Orders.user == session["user_id"]) & (Orders.status == 0)).one_or_none()
         if cart:
             session["cart_id"] = cart.id
-            dishes = utils.db_models.db_session.query(OrderedDishes.id,
-                                                      Dishes.dish_name,
-                                                      Dishes.category,
-                                                      Dishes.ccal,
-                                                      Dishes.fat,
-                                                      Dishes.carb,
-                                                      Dishes.description,
-                                                      OrderedDishes.count,
-                                                      Dishes.price,
-                                                      Dishes.photo,
-                                                      ).join(Dishes, Dishes.id == OrderedDishes.dish_id).filter(
-                OrderedDishes.order_id == cart.id).all()
-
-            fields = ["id", "dish_name", "category", "ccal", "fat", "carb", "description", "count", "price",
-                      "photo"]
-            ordered_dishes = transformation_raw_to_dict(fields, dishes)
-            session["dishes_in_cart"] = ordered_dishes
-            for dish in ordered_dishes:
-                dish["total"] = dish["count"] * dish["price"]
-                dish["fat"] = dish["count"] * dish["fat"]
-                dish["carb"] = dish["count"] * dish["carb"]
-                dish["ccal"] = dish["count"] * dish["ccal"]
-
+            ordered_dishes = get_ordered_dishes(cart.id)
             return render_template("cart.html", dishes=ordered_dishes)
         else:
             return "Cart is empty"
@@ -107,7 +86,6 @@ def add_cart_item():
             utils.db_models.db_session.commit()
 
 
-
 def create_new_order():
     if session.get("user_id"):
         utils.db_models.init_db()
@@ -129,3 +107,34 @@ def make_order():
                 Orders.id == session["cart_id"]).update(
                 {"status": 1, "order_date": datetime.utcnow().replace(microsecond=0)})
             utils.db_models.db_session.commit()
+            send_order_notification(Orders.id)
+
+
+def get_ordered_dishes(order_id):
+    dishes = utils.db_models.db_session.query(OrderedDishes.id,
+                                              Dishes.dish_name,
+                                              Dishes.category,
+                                              Dishes.ccal,
+                                              Dishes.fat,
+                                              Dishes.carb,
+                                              Dishes.description,
+                                              OrderedDishes.count,
+                                              Dishes.price,
+                                              Dishes.photo,
+                                              ).join(Dishes, Dishes.id == OrderedDishes.dish_id).filter(
+        OrderedDishes.order_id == order_id).all()
+
+    fields = ["id", "dish_name", "category", "ccal", "fat", "carb", "description", "count", "price",
+              "photo"]
+    _ordered_dishes = transformation_raw_to_dict(fields, dishes)
+    session["dishes_in_cart"] = _ordered_dishes
+    ordered_dishes = dict()
+    ordered_dishes["order_total"] = 0
+    for dish in _ordered_dishes:
+        dish["total"] = dish["count"] * dish["price"]
+        dish["fat"] = dish["count"] * dish["fat"]
+        dish["carb"] = dish["count"] * dish["carb"]
+        dish["ccal"] = dish["count"] * dish["ccal"]
+        ordered_dishes["order_total"] += dish["total"]
+    ordered_dishes["ordered_dishes"] = _ordered_dishes
+    return ordered_dishes
