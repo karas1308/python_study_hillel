@@ -3,7 +3,6 @@ from flask import redirect, render_template, request, session
 import utils.db_models
 from celery_tasks import send_email
 from constants import user_confirm_body
-from services.orders import get_ordered_dishes
 from utils.common import transformation_raw_to_dict
 from utils.db_models import Dishes, EmailVerification, OrderedDishes, Orders, User
 
@@ -146,8 +145,6 @@ def send_user_email_confirmation(user_id, user):
     send_email.delay(user.email, email_body)
 
 
-def send_order_notification(order_id):
-    user_data = utils.db_models.db_session.query(User.email).where(User.id == session.get("user_id")).one()
-    ordered_dishes = get_ordered_dishes(order_id)
+def send_order_notification(user_email, ordered_dishes):
     email_body = render_template("send_order_to_email.html", dishes=ordered_dishes)
-    send_email.delay(user_data.email, email_body)
+    send_email.delay(user_email, email_body)

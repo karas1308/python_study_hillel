@@ -6,7 +6,7 @@ import utils.db_models
 from logger import log
 from services.users import send_order_notification
 from utils.common import transformation_raw_to_dict
-from utils.db_models import Dishes, OrderedDishes, Orders
+from utils.db_models import Dishes, OrderedDishes, Orders, User
 
 
 def get_cart():
@@ -107,7 +107,10 @@ def make_order():
                 Orders.id == session["cart_id"]).update(
                 {"status": 1, "order_date": datetime.utcnow().replace(microsecond=0)})
             utils.db_models.db_session.commit()
-            send_order_notification(Orders.id)
+            user_data = utils.db_models.db_session.query(
+                User.email).where(User.id == session.get("user_id")).one()
+            ordered_dishes = get_ordered_dishes(Orders.id)
+            send_order_notification(user_data.email, ordered_dishes)
 
 
 def get_ordered_dishes(order_id):
