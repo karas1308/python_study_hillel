@@ -63,6 +63,14 @@ Hello {{ session.user_name}}
             </table>
         </form>
     </div>
+        <div>
+                {% if suggested_dishes_top %}
+                <h2>Most popular with this dish</h2>
+                {% for dish in suggested_dishes_top %}
+                    <p>{{dish}}</p>
+                {% endfor %}
+                {%endif%}
+    </div>
 </div>
 
 
