@@ -24,7 +24,8 @@
                     <th>Total</th>
                 </tr>
                 {% for dish in dishes.ordered_dishes %}
-                <tr>{{dish.dish_name }}</td>
+                <tr>
+                <td>{{dish.dish_name }}</td>
                 <td>{{ dish.ccal }} ccal</td>
                 <td>{{ dish.fat }} fat</td>
                 <td>{{ dish.carb }} carb</td>
