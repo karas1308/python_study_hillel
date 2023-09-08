@@ -109,7 +109,7 @@ def make_order():
             utils.db_models.db_session.commit()
             user_data = utils.db_models.db_session.query(
                 User.email).where(User.id == session.get("user_id")).one()
-            ordered_dishes = get_ordered_dishes(Orders.id)
+            ordered_dishes = get_ordered_dishes(session["cart_id"])
             send_order_notification(user_data.email, ordered_dishes)
 
 
