@@ -1,7 +1,7 @@
 import datetime
 
 
-def calculate_booking_time(booked_time_frames, min_time_duration, min_time_slot=30):
+def calculate_booking_time(booked_time_frames, min_time_duration, min_time_slot=15):
     min_time_duration = datetime.timedelta(hours=min_time_duration)
     min_time_slot = min_time = datetime.timedelta(minutes=min_time_slot)
     working_hours = (datetime.time(8), datetime.time(18))
